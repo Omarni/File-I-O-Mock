@@ -1,0 +1,84 @@
+import Models
+
+class StudentDAO:
+    def __init__(self):
+        self._student_list=[]
+        with open('students.csv', mode = 'r+') as s:
+            for line in s.read().split('\n'):
+                email, s_name, s_password= line.split(",")[:-1]
+                s=Models.Student(email, s_name, s_password)
+                self._student_list.append(s)
+    
+    def get_students(self):
+            return self._student_list
+    
+    def get_student_by_email(self, email):
+        for s in self._student_list:
+            if s.get_email()==email:
+                return s.get_email
+        
+    def validate_user(self, email, pw):
+        for user in self._student_list:
+            if user.get_email()== email:
+                if user.get_password() ==pw:
+                    return True
+        return False 
+class CourseDAO:
+    def __init__(self):
+    
+        self._course_list=[]
+        with open('course.csv', mode='r+') as c:
+            for line in c.read().split('\n'):
+                c_id,c_name,instructor = line.split(",")[:1]
+                c=Models.Course(c_id,c_name,instructor)
+                return self._course_list  
+        
+    def get_courses(self):
+        return self._course_list
+    
+class AttendingDAO:
+    def __init__(self):
+        self._attending_list=[]
+        with open('attending.csv', mode='r+') as a:
+            for line in a.read().split('\n'):
+                course_id, student_email = line.split(",")[:1]
+                a=Models.Attending(course_id, student_email)
+                self._attending_list.append(a)     
+
+    def get_attending(self):
+        return self._attending_list
+    
+    def get_student_courses(self, course_list, email):
+        result=[]
+#When you want to check if an element is in a list, use a FOR statement
+#the word you use after for, make sure it's 
+        for attending in self._attending_list:
+#To find the element, IF statement (input search location) then you '==' the local variable
+            if attending.get_student_email() == email:
+#Because course id is not a local variable we find it by referring to the original class(COURSE) method
+#make sure the current class you are using is addressed. i.e (attending).get_course_id()
+                course_id = attending.get_course_id()
+                for course in course_list:
+                    if course.get_course_id() == course_id:
+                        result.append(course)
+        return result
+
+    def register_student_to_course(self, email, course_id, course_list):
+        for attending in self._attending_list:
+            if attending.get_student_email() == email and attending.get_course_id() == course_id:
+                return False
+            else:
+                for c in course_list:
+                    if c.get_id()== course_id:
+                        a=Models.Attending(course_id, email)
+                        self._attending_list.append(a)
+                        return True
+                return False        
+                              
+    def save_attending(self):
+        try:
+            with open('attending.csv', mode='w') as a:
+            
+        finally:
+            a.close()
+s=StudentDAO()
